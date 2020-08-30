@@ -15,12 +15,15 @@ void *ThreadFunction(void *arg);
 volatile sig_atomic_t i = 0;
 void newHandler();//(int sig);
 
-int main(void) {
+int killed = 1;
+
+int main(void) 
+{
   struct sigaction act, oldact;
   
   pthread_t ThreadID_A;
 
-  const char ThreadArgA[] = "I am thread A.";
+  int arg_P1 = 1;
 
   // Define SHR:
   memset(&act, '\0', sizeof(act));  // Fill act with NULLs by default
@@ -31,18 +34,14 @@ int main(void) {
   // Install SHR:
   sigaction(SIGINT, &act, &oldact);  // This cannot be SIGKILL or SIGSTOP
 
-
-  if(pthread_create(&ThreadID_A, NULL, ThreadFunction, (void*) ThreadArgA)) 
+  printf("Thread A has ID %lu\n", ThreadID_A);
+  if(pthread_create(&ThreadID_A, NULL, ThreadFunction, (void*) &arg_P1)) 
   {
     fprintf(stderr, "No thread A\n");
     exit(EXIT_FAILURE);
   }
+  sleep(1);
 
-  printf("Thread A has ID %lu\n", ThreadID_A);
-
-   // Count Ctrl-Cs pressed; continue upon Enter:
-  printf("press ctrl-C for start counting message(1)\n");
-  
   while(i<25) {
     ;
   }
@@ -56,24 +55,27 @@ int main(void) {
   return 0;
 }
 
-void *ThreadFunction(void *arg) {
-  printf("%s\n", (char *) arg);  // Cast arg (back) to char*
-  pthread_exit(NULL);            // End of thread function
-  printf("\n");
-  char message[3] = "1\n";
-  for(i = 1; i < 25; ++i)
-  { 
-  write(O_WRONLY, &message, sizeof(message));  // Write message to FIFO
-  sleep(1);
-}}
+void *ThreadFunction(void *arg) 
+{
+    int *s_arg= (int*) arg;
+
+    switch(*s_arg)
+    {
+      case 1:
+          printf("\n");
+          char message[3] = "1\n";
+          for(i = 1; i < 25; ++i)
+          { 
+          write(O_WRONLY, &message, sizeof(message)); 
+          sleep(1);
+          }
+      break;         // End of thread function
+    }
+pthread_exit(NULL);
+}
 // SHR using sa_handler:
 void newHandler()
 {
-  printf("\n");
-  char message[3] = "1\n";
-  for(i = 1; i < 25; ++i)
-  { 
-  write(O_WRONLY, &message, sizeof(message));  // Write message to FIFO
-  sleep(1);
-  }
+    printf("\n Stop thread's\n");
+    killed = 0;
 }
