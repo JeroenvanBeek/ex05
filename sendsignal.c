@@ -1,22 +1,19 @@
-#define  _GNU_SOURCE  // Needed by usleep() in gcc
-
-#include <pthread.h>  // threading, mutexes, CVs
-#include <stdio.h>    // sprintf()
-#include <unistd.h>   // write(), usleep()
-#include <stdbool.h>  // true, false
-#include <string.h>   // stren()
-#include <sys/stat.h>       // mkfifo()
-#include <fcntl.h>  
-#include <stdlib.h>
-#include <sys/types.h>
-#include <signal.h>
+#include <stdlib.h>  // strtoul(), exit()
+#include <unistd.h>  // sleep()
+#include <signal.h>  // kill()
+#include <stdio.h>   // printf()
 
 
 int main(int argc, char *argv[])
 {
   unsigned long int PID;
   PID = strtoul(argv[1], NULL, 10);
-
+  
+  if(argc != 2) 
+  {
+    printf("Please give the PID of the receiving process as an argument.\n");
+    exit(1);
+  }
 
   while(1) 
   {
