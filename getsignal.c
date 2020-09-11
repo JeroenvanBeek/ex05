@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 199309L  // sigaction(), struct sigaction, sigemptyset()
 #define  _XOPEN_SOURCE 500  // For S_IFIFO in C99+
+
 #include <stdio.h>   // printf, getchar
 #include <string.h>  // memset
 #include <signal.h>  // sigaction, sigemptyset, struct sigaction, SIGINT
@@ -9,6 +10,7 @@
 #include <fcntl.h>          // open(), O_* constants
 #include <pthread.h>
 
+#define mySigNr 25
 
 void *ThreadFunction(void *arg);
 
@@ -34,6 +36,7 @@ int main(void)
   // Install SHR:
   sigaction(SIGINT, &act, &oldact);  // This cannot be SIGKILL or SIGSTOP
 
+  printf("Waiting for signal %i.  My PID is %i.\n", mySigNr, getpid() );
   printf("Thread A has ID %lu\n", ThreadID_A);
   system("pidof getsignal"); // PID from getsignal another way to get it is 'ps -a'
   
