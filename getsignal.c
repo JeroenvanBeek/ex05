@@ -37,8 +37,7 @@ int main(void)
   sigaction(SIGINT, &act, &oldact);  // This cannot be SIGKILL or SIGSTOP
 
   printf("Waiting for signal %i.  My PID is %i.\n", mySigNr, getpid() );
-  printf("Thread A has ID %lu\n", ThreadID_A);
-  system("pidof getsignal"); // PID from getsignal another way to get it is 'ps -a'
+
   
   if(pthread_create(&ThreadID_A, NULL, ThreadFunction, (void*) &arg_P1)) 
   {
